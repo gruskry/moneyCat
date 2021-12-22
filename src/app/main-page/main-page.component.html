@@ -1,39 +1,57 @@
 <header class="header">
   <div class="header-logo">
-    <img src="../../assets/logo.png" alt="Money Cat">
+    <img class="header-logo_img" src="../../assets/logo.png" alt="Money Cat">
   </div>
   <div class="header-login_btn">
-    <button class="login_btn login_btn-hover" type="button"> Try It Free</button>
+    <a href="#form">
+      <button class="login_btn login_btn-hover" type="button">
+        Try It Free
+      </button>
+    </a>
   </div>
 </header>
 <body>
   <section class="intro-section">
-    <img src="../../assets/mockups.svg">
-    <div class="intro-section_describe"></div>
-    <button class="login_btn">Get Started For Free</button>
+    <img class="intro-section_img" src="../../assets/mockups.svg">
+    <div class="intro-section_describe">
+      <div class="intro-section_header">Take control of your finances</div>
+      <p class="intro-section_text">Money Cat is a budget and finance tool that touts a lot of best-in-class features, as well as support for multiple currencies. The app includes automatic bank syncing for your balance and expenses.</p>
+    </div>
+    <a href="#form">
+      <button class="login_btn">Get Started For Free</button>
+    </a>
   </section>
   <section class="features-section">
-    <img src="../../assets/your-users.svg">
+    <img class="features-section_img" src="../../assets/your-users.svg">
     <div class="features-section_benefits">
-        <p>
-          <b>BUDGETING THAT WORKS</b>
-          Based on the envelope budgeting method – a time-tested system that works!
+      <div class="features-section_textBlock">
+        <div class="features-section_header">BUDGETING THAT WORKS</div>
+        <p class="features-section_text">
+          Based on the envelope budgeting method - a time-tested system that works!
         </p>
-        <p>
-          <b>SYNC & SHARE BUDGETS</b>
+      </div>
+
+      <div class="features-section_textBlock">
+        <div class="features-section_header">SYNC & SHARE BUDGETS</div>
+        <p class="features-section_text">
           Put your budget into action with the people who matter most.
         </p>
-        <p>
-          <b>SAVE FOR BIG EXPENSES</b>
+      </div>
+
+      <div class="features-section_textBlock">
+        <div class="features-section_header">SAVE FOR BIG EXPENSES</div>
+        <p class="features-section_text">
           Plan ahead and be prepared. No more surprises!
         </p>
+      </div>
     </div>
   </section>
-  <section class="login-section">
+  <section class="login-section" id="form">
     <form class="login-section_form" title="Try It Free">
-      <b>Try it Free</b>
+      <div class="login-section_header">Try it Free</div>
       <input type="text" placeholder="email" required>
-      <input type="text" placeholder="password" required>
+      <input type="password" placeholder="password" required>
+      <button type="button" class="login_btn">Get Started</button>
     </form>
   </section>
 </body>
