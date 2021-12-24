@@ -8,11 +8,11 @@
       "schematics": {
         "@schematics/angular:component": {
           "style": "scss"
-     ***REMOVED*****REMOVED***
+        },
         "@schematics/angular:application": {
           "strict": true
         }
-   ***REMOVED*****REMOVED***
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -31,10 +31,11 @@
               "src/assets"
             ],
             "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/purple-green.css",
               "src/styles.scss"
             ],
             "scripts": []
-       ***REMOVED*****REMOVED***
+          },
           "configurations": {
             "production": {
               "budgets": [
@@ -42,7 +43,7 @@
                   "type": "initial",
                   "maximumWarning": "500kb",
                   "maximumError": "1mb"
-             ***REMOVED*****REMOVED***
+                },
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "2kb",
@@ -56,7 +57,7 @@
                 }
               ],
               "outputHashing": "all"
-         ***REMOVED*****REMOVED***
+            },
             "development": {
               "buildOptimizer": false,
               "optimization": false,
@@ -65,27 +66,27 @@
               "sourceMap": true,
               "namedChunks": true
             }
-       ***REMOVED*****REMOVED***
+          },
           "defaultConfiguration": "production"
-     ***REMOVED*****REMOVED***
+        },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
               "browserTarget": "moneyCat:build:production"
-         ***REMOVED*****REMOVED***
+            },
             "development": {
               "browserTarget": "moneyCat:build:development"
             }
-       ***REMOVED*****REMOVED***
+          },
           "defaultConfiguration": "development"
-     ***REMOVED*****REMOVED***
+        },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
             "browserTarget": "moneyCat:build"
           }
-     ***REMOVED*****REMOVED***
+        },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
@@ -99,13 +100,24 @@
               "src/assets"
             ],
             "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/purple-green.css",
               "src/styles.scss"
             ],
             "scripts": []
           }
+        },
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "prerender": false,
+            "ssr": false,
+            "browserTarget": "moneyCat:build:production",
+            "firebaseProject": "moneycat-2e352",
+            "firebaseHostingSite": "moneycat-2e352"
+          }
         }
       }
     }
-***REMOVED***
+  },
   "defaultProject": "moneyCat"
 }

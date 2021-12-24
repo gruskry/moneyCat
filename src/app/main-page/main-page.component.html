@@ -47,11 +47,19 @@
     </div>
   </section>
   <section class="login-section" id="form">
-    <form class="login-section_form" title="Try It Free">
-      <div class="login-section_header">Try it Free</div>
-      <input type="text" placeholder="email" required>
-      <input type="password" placeholder="password" required>
-      <button type="button" class="login_btn">Get Started</button>
+    <mat-spinner *ngIf="isLoad"> </mat-spinner>
+    <form class="login-section_form" [formGroup]="userForm">
+      <div class="login-section_header"> Try It Free</div>
+      <mat-form-field appearance="outline" [color]="'warn'">
+        <input matInput placeholder="email" formControlName="emailUser" required>
+        <mat-error *ngIf="userForm.controls['emailUser'].invalid">{{getErrorEmailMessage()}}</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="password"type="password" formControlName="passwordUser" required>
+        <mat-error *ngIf="userForm.controls['passwordUser'].invalid">{{getErrorPasswordMessage()}}</mat-error>
+      </mat-form-field>
+      <mat-error *ngIf="errorMessage | async">{{errorMessage | async}}</mat-error>
+      <button class="login_btn" mat-button (click)="submit()">Get Started</button>
     </form>
   </section>
 </body>

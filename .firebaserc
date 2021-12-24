@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "moneycat-2e352": {
+      "hosting": {
+        "moneyCat": [
+          "moneycat-2e352"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "moneycat-2e352"
+  }
+}

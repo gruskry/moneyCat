@@ -118,6 +118,18 @@ footer {
   justify-content: center;
   margin: 0 auto;
 
+  ::ng-deep {
+    .mat-progress-spinner circle, .mat-spinner circle {
+      stroke: #1b6808af;
+    }
+
+    .mat-progress-spinner {
+      display: block;
+      position: absolute;
+      overflow: hidden;
+    }
+  }
+
 
   .login-section_form {
     display: flex;
@@ -128,6 +140,7 @@ footer {
     align-items: center;
     background: white;
     border-radius: 10px;
+    box-sizing: border-box;
     box-shadow: 0px 0px 3px 3px rgba(34, 60, 80, 0.2);
 
 
@@ -138,21 +151,28 @@ footer {
       margin: 20px;
     }
 
-    input {
+    .mat-form-field {
       width: 80%;
-      height: 40px;
-      margin-bottom: 10px;
-      outline: none;
-      border-radius: 5px;
-      border: 1px solid rgba(0, 128, 0, 0.61);
-      text-indent: 10px;
-      font-size: 16px;
+      font-size: 0.8rem;
     }
 
-    input:focus {
-      box-shadow: 0px 0px 3px 3px rgba(23, 170, 18, 0.377);
-      transition: linear .2s;
+    input::placeholder {
+      color: black;
+      font-size: 1.2em;
     }
+
+    ::ng-deep {
+      .mat-form-field-appearance-outline .mat-form-field-outline {
+         color: rgba(0, 128, 0, 0.397);
+      }
+      mat-form-field {
+         .mat-hint, input, ::placeholder, .mat-form-field-label {
+           font-size: 0.8rem;
+            color: black;
+         }
+      }
+
+   }
 
     button {
       margin: 10px 0 20px 0;
@@ -172,4 +192,31 @@ footer {
   }
 }
 
+@media screen and (max-width: 1024px) {
+  .features-section {
+    flex-direction: column;
+    .features-section_textBlock {
+      margin: 40px 0;
+      font-size: 0.8rem;
+      width: auto;
+      text-align: center;
+    }
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .features-section {
+    .features-section_textBlock {
+      margin: 20px;
+      font-size: 0.8rem;
+      width: auto;
+      text-align: center;
+    }
+  }
+}
 
