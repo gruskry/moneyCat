@@ -1,16 +1,70 @@
 <header class="header">
   <div class="header-logo">
-    <img src="../../assets/logo.png" alt="Money Cat">
+    <img class="header-logo_img" src="../../assets/logo.png" alt="Money Cat">
   </div>
   <div class="header-login_btn">
-    <button class="login_btn" type="button"> Try It Free</button>
+    <a href="#form">
+      <button class="login_btn login_btn-hover" type="button">
+        Try It Free
+      </button>
+    </a>
   </div>
 </header>
 <body>
-  <section class="intro-section"></section>
-  <section class="features-section"></section>
-  <section class="login-section"></section>
+  <section class="intro-section">
+    <img class="intro-section_img" src="../../assets/mockups.svg">
+    <div class="intro-section_describe">
+      <div class="intro-section_header">Take control of your finances</div>
+      <p class="intro-section_text">Money Cat is a budget and finance tool that touts a lot of best-in-class features, as well as support for multiple currencies. The app includes automatic bank syncing for your balance and expenses.</p>
+    </div>
+    <a href="#form">
+      <button class="login_btn">Get Started For Free</button>
+    </a>
+  </section>
+  <section class="features-section">
+    <img class="features-section_img" src="../../assets/your-users.svg">
+    <div class="features-section_benefits">
+      <div class="features-section_textBlock">
+        <div class="features-section_header">BUDGETING THAT WORKS</div>
+        <p class="features-section_text">
+          Based on the envelope budgeting method - a time-tested system that works!
+        </p>
+      </div>
+
+      <div class="features-section_textBlock">
+        <div class="features-section_header">SYNC & SHARE BUDGETS</div>
+        <p class="features-section_text">
+          Put your budget into action with the people who matter most.
+        </p>
+      </div>
+
+      <div class="features-section_textBlock">
+        <div class="features-section_header">SAVE FOR BIG EXPENSES</div>
+        <p class="features-section_text">
+          Plan ahead and be prepared. No more surprises!
+        </p>
+      </div>
+    </div>
+  </section>
+  <section class="login-section" id="form">
+    <mat-spinner *ngIf="isLoad"> </mat-spinner>
+    <form class="login-section_form" [formGroup]="userForm">
+      <div class="login-section_header"> Try It Free</div>
+      <mat-form-field appearance="outline" [color]="'warn'">
+        <input matInput placeholder="email" formControlName="emailUser" required>
+        <mat-error *ngIf="userForm.controls['emailUser'].invalid">{{getErrorEmailMessage()}}</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="password"type="password" formControlName="passwordUser" required>
+        <mat-error *ngIf="userForm.controls['passwordUser'].invalid">{{getErrorPasswordMessage()}}</mat-error>
+      </mat-form-field>
+      <mat-error *ngIf="errorMessage | async">{{errorMessage | async}}</mat-error>
+      <button class="login_btn" mat-button (click)="submit()">Get Started</button>
+    </form>
+  </section>
 </body>
 <footer class="footer">
-  <div class="rights"></div>
+  <div class="rights">
+    &copy; Copyright 2019 Money Cat. All rights reserved.
+  </div>
 </footer>

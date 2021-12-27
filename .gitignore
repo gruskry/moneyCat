@@ -9,6 +9,7 @@
 
 # dependencies
 /node_modules
+/src/environments
 
 # profiling files
 chrome-profiler-events*.json
@@ -23,12 +24,12 @@ chrome-profiler-events*.json
 *.sublime-workspace
 
 # IDE - VSCode
-.vscode***REMOVED***
+.vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-.history***REMOVED***
+.history/*
 
 # misc
 /.sass-cache
@@ -43,3 +44,8 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# Firebase
+.firebase
+*-debug.log
+.runtimeconfig.json

@@ -1,0 +1,222 @@
+header, body {
+  background-color: #F1FFE7;
+  font-size: 10px;
+}
+
+footer {
+ background-color: #003F2F;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  .header-logo_img {
+    width: 70%;
+  }
+  .login_btn-hover {
+    width: 200px;
+    background-color: white;
+    color: black;
+  }
+
+  .login_btn-hover:hover {
+    background-color: #fc7753;
+    transition: linear .2s;
+    color: white;
+  }
+
+  .login_btn-hover:active {
+    transform: translateY(10px);
+  }
+}
+
+.login_btn {
+  background-color: #fc7753;
+  color: white;
+  border: none;
+  width: auto;
+  height: 50px;
+  cursor: pointer;
+  box-shadow: 0px 0px 3px 3px rgba(34, 60, 80, 0.2);
+  border-radius: 5px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  padding: 0 20px;
+}
+
+.login_btn:hover {
+  transition: linear .2s;
+  text-shadow: 0 0 10px white,0 0 20px white,0 0 30px white,0 0 40px white;
+}
+
+.login_btn:active {
+  transform: translateY(10px);
+}
+
+.intro-section {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+
+  .intro-section_img{
+    width: 50%;
+  }
+
+  .intro-section_describe {
+    width: 50%;
+    text-align: center;
+    margin: 20px 0px;
+
+    .intro-section_header {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .intro-section_text {
+      font-size: 1rem;
+      color: grey;
+    }
+  }
+}
+
+.features-section {
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  .features-section_img {
+    width: 40%;
+  }
+
+  .features-section_textBlock {
+    margin-bottom: 50px;
+    font-size: 0.9rem;
+    width: 80%;
+
+    .features-section_header {
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .features-section_text {
+      color: grey;
+    }
+  }
+}
+
+.login-section {
+  width: 40%;
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+
+  ::ng-deep {
+    .mat-progress-spinner circle, .mat-spinner circle {
+      stroke: #1b6808af;
+    }
+
+    .mat-progress-spinner {
+      display: block;
+      position: absolute;
+      overflow: hidden;
+    }
+  }
+
+
+  .login-section_form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 30px 0;
+    width: 100%;
+    align-items: center;
+    background: white;
+    border-radius: 10px;
+    box-sizing: border-box;
+    box-shadow: 0px 0px 3px 3px rgba(34, 60, 80, 0.2);
+
+
+    .login-section_header {
+      font-size: 32px;
+      font-weight: 700;
+      text-align: center;
+      margin: 20px;
+    }
+
+    .mat-form-field {
+      width: 80%;
+      font-size: 0.8rem;
+    }
+
+    input::placeholder {
+      color: black;
+      font-size: 1.2em;
+    }
+
+    ::ng-deep {
+      .mat-form-field-appearance-outline .mat-form-field-outline {
+         color: rgba(0, 128, 0, 0.397);
+      }
+      mat-form-field {
+         .mat-hint, input, ::placeholder, .mat-form-field-label {
+           font-size: 0.8rem;
+            color: black;
+         }
+      }
+
+   }
+
+    button {
+      margin: 10px 0 20px 0;
+    }
+  }
+}
+
+.footer {
+  height: 40px;
+  color: white;
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
+
+  .rights {
+    margin: auto 0;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .features-section {
+    flex-direction: column;
+    .features-section_textBlock {
+      margin: 40px 0;
+      font-size: 0.8rem;
+      width: auto;
+      text-align: center;
+    }
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .features-section {
+    .features-section_textBlock {
+      margin: 20px;
+      font-size: 0.8rem;
+      width: auto;
+      text-align: center;
+    }
+  }
+}
+
