@@ -8,11 +8,13 @@ import { BehaviorSubject, from, Observable } from 'rxjs';
 })
 export class AuthenticationService {
   isLoggedIn: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  isMainPage:  BehaviorSubject<boolean> = new BehaviorSubject(false);
   constructor(public auth: Auth) { }
 
   logginState() {
     this.auth.onAuthStateChanged((user) => {
-      user ? this.isLoggedIn.next(true) : this.isLoggedIn.next(false);
+      user ? this.isLoggedIn.next(true): this.isLoggedIn.next(false);
+      this.isLoggedIn.value === true ? this.isMainPage.next(false) : this.isMainPage.next(true);
     })
   }
 
