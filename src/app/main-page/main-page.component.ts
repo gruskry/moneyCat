@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { collection, doc, docData, Firestore, setDoc } from '@angular/fire/firestore';
+
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { AuthenticationService } from '../services/authentication.service';
@@ -22,7 +24,8 @@ export class MainPageComponent implements OnInit{
 
   constructor(
     public formBuilder: FormBuilder,
-    private authService: AuthenticationService
+    public fireService: Firestore,
+    private authService: AuthenticationService,
     ) { }
   ngOnInit(): void {
     this.isLoggedIn = this.authService.isLoggedIn;
@@ -41,7 +44,6 @@ export class MainPageComponent implements OnInit{
           if(cred) this.authService.isLoggedIn.next(true);
         })
         .catch(err => {
-          console.log(err.message)
           if(err.message === "Firebase: Error (auth/wrong-password).") {
             this.errorMessage.next("Wrong password or this email is exist")
             this.isLoad = false;
@@ -53,7 +55,7 @@ export class MainPageComponent implements OnInit{
             .then(userCred => {
               if(userCred) this.authService.isLoggedIn.next(true);
             })
-            .catch(errMsg => { console.log(errMsg.message)
+            .catch(errMsg => {
               if(errMsg.message === "Firebase: Password should be at least 6 characters (auth/weak-password).") {
                 this.errorMessage.next("Password should be at least 6 characters");
               }
