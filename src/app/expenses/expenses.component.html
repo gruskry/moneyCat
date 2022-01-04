@@ -36,7 +36,7 @@
         <mat-error *ngIf="expenseForm.controls['category'].invalid">{{getErrorMessage()}}</mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline" >
-        <input matInput placeholder="amount" formControlName="amount">
+        <input matInput placeholder="amount" formControlName="amount" type="number">
         <mat-error *ngIf="expenseForm.controls['amount'].invalid">{{getErrorMessage()}}</mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">

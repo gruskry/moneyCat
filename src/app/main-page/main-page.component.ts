@@ -36,7 +36,8 @@ export class MainPageComponent implements OnInit{
     return (this.userForm.get('emailUser').valid && this.userForm.get('passwordUser').valid)
   }
 
-  submit() {
+
+  singIn() {
     if(this.userForm.valid) {
       this.isLoad = true;
       this.authService.singIn(this.userForm.value.emailUser,this.userForm.value.passwordUser)
@@ -48,22 +49,33 @@ export class MainPageComponent implements OnInit{
             this.errorMessage.next("Wrong password or this email is exist")
             this.isLoad = false;
             this.userForm.reset()
-          }
-          if(err.message === "Firebase: Error (auth/user-not-found).") {
 
-            this.authService.singUp(this.userForm.value.emailUser,this.userForm.value.passwordUser)
-            .then(userCred => {
-              if(userCred) this.authService.isLoggedIn.next(true);
-            })
-            .catch(errMsg => {
-              if(errMsg.message === "Firebase: Password should be at least 6 characters (auth/weak-password).") {
-                this.errorMessage.next("Password should be at least 6 characters");
-              }
-            })
-
-            this.isLoad = false
+            if(err.message === "Firebase: Error (auth/user-not-found).") {
+              this.errorMessage.next("User not found. Please sing up");
+            }
           }
         })
+    }
+  }
+
+  singUp() {
+    if(this.userForm.valid) {
+      this.isLoad = true;
+      this.authService.singUp(this.userForm.value.emailUser,this.userForm.value.passwordUser)
+      .then(userCred => {
+        if(userCred) this.authService.isLoggedIn.next(true);
+      })
+      .catch(errMsg => {
+        if(errMsg.message === "Firebase: Error (auth/wrong-password).") {
+          this.errorMessage.next("Wrong password or this email is exist")
+          this.isLoad = false;
+          this.userForm.reset()
+        }
+        if(errMsg.message === "Firebase: Password should be at least 6 characters (auth/weak-password).") {
+          this.errorMessage.next("Password should be at least 6 characters");
+        }
+      })
+      this.isLoad = false
     }
   }
 

@@ -59,7 +59,10 @@
         <mat-error *ngIf="userForm.controls['passwordUser'].invalid">{{getErrorPasswordMessage()}}</mat-error>
       </mat-form-field>
       <mat-error *ngIf="errorMessage | async">{{errorMessage | async}}</mat-error>
-      <button class="login_btn" mat-button (click)="submit()">Get Started</button>
+      <div class="btn-block">
+        <button class="login_btn" mat-button (click)="singIn()">Sing In</button>
+        <button class="login_btn" mat-button (click)="singUp()">Sing Up</button>
+      </div>
     </form>
   </section>
 </body>
