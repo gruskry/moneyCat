@@ -135,6 +135,9 @@ body.expense-body {
     background-color: rgba(31, 162, 48, 0.3);
   }
 
+  .mat-calendar-body-selected {
+    background-color: #09ac24;
+  }
 }
 
 .results {
@@ -151,5 +154,15 @@ body.expense-body {
   p {
     margin: auto 10px;
     padding: 10px 0;
+    width: 33%;
+    text-align: center;
+  }
+
+  p:first-child {
+    text-align: start;
+  }
+
+  p:last-child {
+    text-align: end;
   }
 }
