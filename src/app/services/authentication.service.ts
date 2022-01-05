@@ -1,5 +1,7 @@
+import { ExpenseService } from './expense.service';
 import { Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword } from '@angular/fire/auth';
+import { Firestore } from '@angular/fire/firestore';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { BehaviorSubject, from, Observable } from 'rxjs';
 
@@ -8,11 +10,16 @@ import { BehaviorSubject, from, Observable } from 'rxjs';
 })
 export class AuthenticationService {
   isLoggedIn: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  constructor(public auth: Auth) { }
+  isMainPage:  BehaviorSubject<boolean> = new BehaviorSubject(false);
+  constructor(
+    public auth: Auth,
+    private expenseSerice: ExpenseService) { }
 
   logginState() {
     this.auth.onAuthStateChanged((user) => {
-      user ? this.isLoggedIn.next(true) : this.isLoggedIn.next(false);
+      if(user) this.expenseSerice.currentUserSubj.next(user.uid);
+      user ? this.isLoggedIn.next(true): this.isLoggedIn.next(false);
+      this.isLoggedIn.value === true ? this.isMainPage.next(false) : this.isMainPage.next(true);
     })
   }
 

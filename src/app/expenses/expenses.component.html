@@ -1,2 +1,56 @@
-<h1>Page in development</h1>
-<button mat-button class="login_btn" (click)="logout()">logout</button>
+
+<body class="expense-body">
+  <div class="nav-bar">
+    <div class="logo-logout" (click)="logout()">
+      <p class="logout">Logout</p>
+    </div>
+  </div>
+
+  <div class="data-block">
+
+    <form class="expense-form" [formGroup]="expenseForm" >
+      <mat-form-field class="date-form-field" appearance="outline">
+        <input
+          matInput
+          [matDatepicker]="picker"
+          placeholder="Choose a date"
+          formControlName="date"
+          (dateInput)="changeDate('input', $event)"
+          >
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker  #picker></mat-datepicker>
+        <mat-error *ngIf="expenseForm.controls['date'].invalid">{{getErrorMessage()}}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="expense title" formControlName="title">
+        <mat-error *ngIf="expenseForm.controls['title'].invalid">{{getErrorMessage()}}</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-select [(value)]="selected">
+          <mat-option value="Home">Home</mat-option>
+          <mat-option value="Travel">Travel</mat-option>
+          <mat-option value="Car">Car</mat-option>
+          <mat-option value="Food">Food</mat-option>
+        </mat-select>
+        <mat-error *ngIf="expenseForm.controls['category'].invalid">{{getErrorMessage()}}</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" >
+        <input matInput placeholder="amount" formControlName="amount">
+        <mat-error *ngIf="expenseForm.controls['amount'].invalid">{{getErrorMessage()}}</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="BYN" value="BYN" disabled>
+      </mat-form-field>
+      <button mat-button class="login_btn" type="submit" (click)="submit()"> Add expense</button>
+    </form>
+  </div>
+
+  <div class="results" *ngFor="let row of rows">
+    <mat-spinner *ngIf="isLoad"></mat-spinner>
+    <p class="title">{{row.title}}</p>
+    <p class="category">{{row.category}}</p>
+    <p class="amount">{{row.amount}} BYN</p>
+  </div>
+</body>
+
