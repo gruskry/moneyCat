@@ -9,13 +9,7 @@ import { AuthenticationService } from './services/authentication.service';
 })
 export class AppComponent implements OnInit {
   title = 'moneyCat';
-  isLogginedIn: BehaviorSubject<boolean> = new BehaviorSubject(false)
-  isMainPage: BehaviorSubject<boolean> = new BehaviorSubject(false)
-  constructor(private authService: AuthenticationService) {
-    this.authService.logginState();
-    this.isMainPage =  this.authService.isMainPage;
-    this.isLogginedIn = this.authService.isLoggedIn;
-  }
+  constructor() {}
 
   ngOnInit(): void {
 

@@ -60,8 +60,8 @@
       </mat-form-field>
       <mat-error *ngIf="errorMessage | async">{{errorMessage | async}}</mat-error>
       <div class="btn-block">
-        <button class="login_btn" mat-button (click)="singIn()">Sing In</button>
-        <button class="login_btn" mat-button (click)="singUp()">Sing Up</button>
+        <button class="login_btn" mat-button (click)="singIn()" routerLink="/expenses">Sing In</button>
+        <button class="login_btn" mat-button (click)="singUp()" routerLink="/expenses">Sing Up</button>
       </div>
     </form>
   </section>
@@ -71,3 +71,4 @@
     &copy; Copyright 2019 Money Cat. All rights reserved.
   </div>
 </footer>
+

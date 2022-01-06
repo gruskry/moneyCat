@@ -1,7 +1,7 @@
 
 <body class="expense-body">
   <div class="nav-bar">
-    <div class="logo-logout" (click)="logout()">
+    <div class="logo-logout" (click)="logout()" routerLink="/home">
       <p class="logout">Logout</p>
     </div>
   </div>
@@ -36,11 +36,23 @@
         <mat-error *ngIf="expenseForm.controls['category'].invalid">{{getErrorMessage()}}</mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline" >
-        <input matInput placeholder="amount" formControlName="amount" type="number">
+        <input matInput placeholder="amount" formControlName="amount" type="number" min="0">
         <mat-error *ngIf="expenseForm.controls['amount'].invalid">{{getErrorMessage()}}</mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
-        <input matInput placeholder="BYN" value="BYN" disabled>
+        <input
+          type="text"
+          matInput
+          formControlName="currency"
+          required
+          [matAutocomplete]="auto"
+          placeholder="currency"
+        >
+          <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let currency of filteredCurrencies | async" value="{{currency.Cur_Name_Eng}} ({{currency.Cur_Abbreviation}})">
+              {{currency.Cur_Name_Eng}} ({{currency.Cur_Abbreviation}})
+            </mat-option>
+          </mat-autocomplete>
       </mat-form-field>
       <button mat-button class="login_btn" type="submit" (click)="submit()"> Add expense</button>
     </form>
@@ -49,8 +61,30 @@
   <div class="results" *ngFor="let row of rows">
     <mat-spinner *ngIf="isLoad"></mat-spinner>
     <p class="title">{{row.title}}</p>
-    <p class="category">{{row.category}}</p>
-    <p class="amount">{{row.amount}} BYN</p>
+    <p class="category">{{row.category}} </p>
+
+    <form class="result-form"[formGroup]="expenseForm">
+      <p class="amount">{{row.amount}}
+
+
+
+      </p>
+
+      <mat-form-field>
+        <mat-select [value]="row.currency" (click)="checkCurrentCurrency(row.currency, row.amount, $event)">
+          <input
+            class="currency-changer"
+            placeholder="Search value"
+            formControlName="currencyChange"
+          >
+          <mat-option *ngFor="let currency of filteredCurrenciesChange | async " value="{{currency.Cur_Name_Eng}} ({{currency.Cur_Abbreviation}})" (click)='checkSelectedCurrency(currency.Cur_Abbreviation, row.amount)'>
+            {{currency.Cur_Name_Eng}} ({{currency.Cur_Abbreviation}})
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+
+
   </div>
 </body>
 

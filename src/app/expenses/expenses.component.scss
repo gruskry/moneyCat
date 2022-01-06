@@ -65,13 +65,13 @@ body.expense-body {
         font-size: 1rem;
         color: black;
         background-color: white;
-      }
-      mat-datepicker-toggle {
-        color: black;
-      }
-      ::placeholder {
-        color: grey;
-      }
+    }
+    mat-datepicker-toggle {
+      color: black;
+    }
+    ::placeholder {
+      color: grey;
+    }
     }
   }
 
@@ -108,11 +108,29 @@ body.expense-body {
   .mat-select-panel {
     background: #f5f5f5;
     color: black;
+
+    input.currency-changer {
+      font-size: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      width: 100%;
+      line-height: 16px;
+      border: 12px solid black;
+      box-sizing: border-box;
+      border-color: #0080003d;
+    }
   }
   .mat-primary .mat-option.mat-selected:not(.mat-option-disabled) {
     background-color: #53aa1a;
   }
 
+  .mat-option.mat-selected:not(.mat-option-multiple):not(.mat-option-disabled) {
+    background: #339227a6;
+  }
+  .mat-autocomplete-panel .mat-option.mat-selected:not(.mat-active):not(:hover) {
+    background: #35a326;
+}
   .mat-option-text{
     font-size: 1rem;
     color: #000;
@@ -138,6 +156,42 @@ body.expense-body {
   .mat-calendar-body-selected {
     background-color: #09ac24;
   }
+
+  .mat-autocomplete-panel {
+    overflow-y: scroll;
+    background-color: #90b482d1;
+  }
+
+  .mat-select-value {
+    font-size: 1rem;
+    color: rgb(0, 0, 0);
+  }
+  .mat-select-panel {
+    color: black;
+
+  }
+  .mat-select-arrow {
+    color: rgba(3, 0, 0, 0.7);
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-outline {
+    color: rgba(0, 128, 0, 0.589);
+    background-color: white;
+    border-radius: 5px;
+  }
+
+  .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+    color: rgba(0, 128, 0, 0.589);
+  }
+
+  .mat-form-field-appearance-legacy .mat-form-field-wrapper {
+    padding-bottom: 13px;
+    width: 85%;
+  }
+
+  .mat-form-field.mat-focused .mat-form-field-ripple {
+    background-color: rgba(0, 128, 0, 0.589);
+}
 }
 
 .results {
@@ -163,6 +217,36 @@ body.expense-body {
   }
 
   p:last-child {
-    text-align: end;
+    text-align: center;
+  }
+
+  input::placeholder {
+    color: black;
+    font-size: 1.2em;
+  }
+
+  form {
+    display: flex;
+    width: 33%;
+    justify-content: right;
+
+    p {
+      white-space: nowrap;
+      margin: auto 0;
+      padding-right: 20px;
+      text-align: right;
+    }
+
+    .results-currency {
+      font-size: 15px;
+    }
+  }
+
+  ::ng-deep {
+    .mat-form-field {
+      margin-left: 5px;
+    }
   }
 }
+
+
