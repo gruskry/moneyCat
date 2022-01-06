@@ -1,10 +1,11 @@
+import { CurrencyModel } from './../models/currency.model';
+import { map, startWith } from 'rxjs/operators';
 import { ExpenseService } from './../services/expense.service';
-import { BehaviorSubject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
-import { environment } from 'src/environments/environment';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 
 @Component({
@@ -13,34 +14,42 @@ import { MatDatepickerInputEvent } from '@angular/material/datepicker';
   styleUrls: ['./expenses.component.scss', '../main-page/main-page.component.scss'],
   providers: [DatePipe]
 })
+
 export class ExpensesComponent implements OnInit {
   dateNow = new Date();
   currentDate: string = this.datePipe.transform(this.dateNow,"dd/MM/yyyy");
+  currentExchangeCurrency: string;
+  currentExchangeAmount: number;
   selected: string = 'Home';
-  isLogginedIn: BehaviorSubject<boolean> = new BehaviorSubject(false)
+  exchangeRate: number;
+  defaultCurrency: string = 'Albanian Lek (ALL)';
   rows = [];
   isLoad: boolean = false;
-
-
+  targetClassList = [];
+  index: number = 0;
+  currencies: CurrencyModel[] = this.authService.currencies.value;
+  filteredCurrencies: Observable<CurrencyModel[]>;
+  filteredCurrenciesChange: Observable<CurrencyModel[]>;
   expenseForm = this.formBuilder.group({
     "date": new FormControl(this.dateNow, [Validators.required]),
     "title": new FormControl('', [Validators.required]),
     "category": new FormControl('Home', [Validators.required]),
-    "amount": new FormControl('', [Validators.required])
+    "amount": new FormControl('', [Validators.required]),
+    'currency': new FormControl('', [Validators.required]),
+    'currencyChange': new FormControl(''),
   })
-
+  selectedStates = this.currencies;
 
   constructor(
     private authService: AuthenticationService,
     public formBuilder: FormBuilder,
     private datePipe: DatePipe,
     private expenseService: ExpenseService,
-    ) { }
+    ) {}
 
   ngOnInit(): void {
-    this.isLogginedIn = this.authService.isLoggedIn;
     this.rows = [];
-
+    this.currencies = this.currencies.filter((v,i,a)=>a.findIndex(t=>(t.Cur_Name === v.Cur_Name))===i);
     this.expenseService.getOptions().then(user => {
       this.isLoad = true
       if (user.exists()) {
@@ -52,8 +61,25 @@ export class ExpensesComponent implements OnInit {
       }
       this.isLoad = false;
     })
+    this.filteredCurrencies = this.expenseForm.get('currency')!.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(value)),
+    )
+    this.filteredCurrenciesChange = this.expenseForm.get('currencyChange').valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(value))
+    )
+
+  }
+  private _filter(value: string): CurrencyModel[] {
+
+    const filterValue = this._normalizeValue(value);
+    return this.currencies.filter(currency => this._normalizeValue(currency.Cur_Name_Eng + currency.Cur_Abbreviation).includes(filterValue));
   }
 
+  private _normalizeValue(value: string): string {
+    return value.toLowerCase().replace(/\s/g, '');
+  }
   logout() {
     this.authService.logout()
   }
@@ -95,4 +121,24 @@ export class ExpensesComponent implements OnInit {
     ? 'You must enter a value'
     : ''
   }
+
+  checkSelectedCurrency(selectedCurrency: string, currentAmount: number) {
+    this.expenseService.getExchangeRates(this.currentExchangeCurrency, selectedCurrency).subscribe((data) => {
+     this.exchangeRate = (data[`${this.currentExchangeCurrency}_${selectedCurrency}`]*this.currentExchangeAmount);
+    })
+  }
+
+  checkCurrentCurrency(currentCurrency: string, currentAmount: number, event) {
+
+    this.targetClassList.push(event.target.className);
+    if(this.index === 0) {
+      this.currentExchangeAmount = currentAmount;
+      this.currentExchangeCurrency = currentCurrency.slice(-4,-1);
+    } else if (!(this.targetClassList[this.index-1] === event.target.className)) {
+      this.currentExchangeAmount = currentAmount;
+      this.currentExchangeCurrency = currentCurrency.slice(-4,-1);
+    }
+    this.index++;
+  }
 }
+

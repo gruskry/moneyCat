@@ -16,14 +16,17 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
-import { FirestoreModule, getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { FirestoreModule } from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
 import { provideAuth,getAuth } from '@angular/fire/auth';
 import { AuthenticationService } from './services/authentication.service';
 import { ExpensesComponent } from './expenses/expenses.component';
 import { ExpenseService } from './services/expense.service';
+import { ExpensesGuard } from './guards/expenses.guard';
+import { HttpClientModule } from '@angular/common/http';
 @NgModule({
   declarations: [
     AppComponent,
@@ -45,11 +48,13 @@ import { ExpenseService } from './services/expense.service';
     MatDatepickerModule,
     MatNativeDateModule,
     MatSelectModule,
+    MatAutocompleteModule,
     FirestoreModule,
+    HttpClientModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
   ],
-  providers: [AuthenticationService, ExpenseService, DatePipe],
+  providers: [AuthenticationService, ExpenseService, DatePipe, ExpensesGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
