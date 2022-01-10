@@ -38,7 +38,6 @@ export class ExpensesComponent implements OnInit {
     'currency': new FormControl('', [Validators.required]),
     'currencyChange': new FormControl(''),
   })
-  selectedStates = this.currencies;
 
   constructor(
     private authService: AuthenticationService,

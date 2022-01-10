@@ -22,11 +22,10 @@ export class AuthenticationService {
   logginState(): Observable<boolean> {
     this.auth.onAuthStateChanged((user) => {
       if(user) this.expenseSerice.currentUserSubj.next(user.uid);
-      user? this.isLoggedIn.next(true): this.isLoggedIn.next(false);
       if (user?.emailVerified) {
         this._route.navigateByUrl('/expenses')
         this.isLoggedIn.next(true)
-      }else {
+      } else {
         this.isLoggedIn.next(false)
       }
     })
@@ -43,6 +42,7 @@ export class AuthenticationService {
   singUp(email: string, password: string): Promise<any>  {
     return createUserWithEmailAndPassword(this.auth, email, password)
   }
+
   logout(): Observable<any> {
     this.isLoggedIn.next(false);
     return from(this.auth.signOut());
