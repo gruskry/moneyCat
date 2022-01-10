@@ -15,6 +15,7 @@ export class ExpensesGuard implements CanActivate{
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) : Observable<boolean> | boolean{
       let userState = new Subject<boolean>();
       this.authService.logginState().subscribe(currentState => {
+        console.log(currentState)
         userState.next(currentState)
       })
       return userState.asObservable();
