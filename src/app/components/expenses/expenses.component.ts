@@ -7,7 +7,6 @@ import { AuthenticationService } from '../../services/authentication.service';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
@@ -22,7 +21,7 @@ import { TotalDialogComponent } from '../total-dialog/total-dialog.component';
 
 export class ExpensesComponent implements OnInit {
   dateNow = new Date();
-  currentDate: string = this.datePipe.transform(this.dateNow,"dd/MM/yyyy");
+  currentDate: string = this.datePipe.transform(this.dateNow,"MM/dd/yyyy");
   currentExchangeCurrency: string;
   currentExchangeAmount: number;
   selected: string = 'Home';
@@ -110,18 +109,19 @@ export class ExpensesComponent implements OnInit {
   submit() {
     if(this.expenseForm.valid) {
       this.expenseForm.value.category = this.selected;
-      this.expenseForm.value.date = this.datePipe.transform(this.expenseForm.value.date, 'dd/MM/yyyy')
+      this.expenseForm.value.date = this.datePipe.transform(this.expenseForm.value.date, 'MM/dd/yyyy')
       this.rows.push(this.expenseForm.value);
       this.dataSource = new MatTableDataSource(this.rows);
-      this.resetCurrencies()
+
       this.expenseService.setOptions(this.rows);
+      this.resetCurrencies()
     }
   }
 
   changeDate(event: MatDatepickerInputEvent<Date>) {
     this.rows = [];
     this.isLoad = true;
-    let chosenDate = this.datePipe.transform(event.value,"dd/MM/yyyy");
+    let chosenDate = this.datePipe.transform(event.value,"MM/dd/yyyy");
     let dateReqFormat = this.datePipe.transform(event.value, 'MMddyyyy');
     this.expenseService.chosenDate.next(dateReqFormat)
     this.expenseService.getOptionsDate().then(user => {
@@ -156,7 +156,8 @@ export class ExpensesComponent implements OnInit {
   }
 
   checkSelectedCurrency(selectedCurrency) {
-    this.rows.map((currency: DbModel) => {
+    this.dataSource = new MatTableDataSource(this.rows)
+    this.rows.map((currency) => {
       this.currencies.forEach(typeCur => {
         let fullNameCurrency = `${typeCur.Cur_Name} (${typeCur.Cur_Abbreviation})`
         if(fullNameCurrency.includes(currency.currency)) {
@@ -171,18 +172,12 @@ export class ExpensesComponent implements OnInit {
   }
 
   resetCurrencies() {
-    this.rows = []
+    this.rowsWithDefaultCur = []
     this.expenseService.getOptionsDate().then(user => {
       this.isLoad = true
       if (user.exists()) {
-        user.data().options.forEach(el => {
-          if(el.date === this.currentDate) {
-            this.rows.push(el);
-            this.dataSource = new MatTableDataSource(this.rows);
-          };
-        });
-      } else {
-         this.rows = [];
+        this.rowsWithDefaultCur = user.data().options;
+        this.dataSource = new MatTableDataSource(this.rowsWithDefaultCur)
       }
       this.isLoad = false;
     })
