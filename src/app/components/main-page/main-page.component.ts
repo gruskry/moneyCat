@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { sendEmailVerification } from '@angular/fire/auth';
-import { collection, doc, docData, Firestore, setDoc } from '@angular/fire/firestore';
 
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { AuthenticationService } from '../services/authentication.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { BehaviorSubject } from 'rxjs';
+import { AuthenticationService } from '../../services/authentication.service';
 
 @Component({
   selector: 'app-main-page',
@@ -23,9 +23,9 @@ export class MainPageComponent implements OnInit{
   })
 
   constructor(
-    public formBuilder: FormBuilder,
-    public fireService: Firestore,
+    private formBuilder: FormBuilder,
     private authService: AuthenticationService,
+    private _snackBar: MatSnackBar,
     ) { }
   ngOnInit(): void {
     this.authService.logginState()
@@ -42,8 +42,8 @@ export class MainPageComponent implements OnInit{
       this.authService.singIn(this.userForm.value.emailUser,this.userForm.value.passwordUser)
         .then(cred =>  {
           if(cred) {
-            if (!cred.user?.emailVerified) {
-              this.errorMessage.next("Please verify your email")
+            if (!cred.user.emailVerified) {
+              this._snackBar.open('Please verify your email address', 'OK', {duration: 5000})
               this.userForm.reset();
             }
           }
@@ -71,7 +71,7 @@ export class MainPageComponent implements OnInit{
       .then(userCred => {
         sendEmailVerification(userCred.user);
         if (!userCred.user.emailVerified) {
-          this.errorMessage.next("Please verify your email and sing In");
+          this._snackBar.open('Please verify your email and sing In', 'OK', {duration: 5000})
           this.userForm.reset()
         }
       })
@@ -94,7 +94,7 @@ export class MainPageComponent implements OnInit{
     }
   }
 
-  getErrorEmailMessage() {
+  getErrorEmailMessage(): string {
       if (this.userForm.controls['emailUser'].hasError('required')) {
         return 'You must enter a value';
       }
@@ -102,7 +102,7 @@ export class MainPageComponent implements OnInit{
       return this.userForm.controls['emailUser'].hasError('pattern') ? 'Not a valid email' : '';
   }
 
-  getErrorPasswordMessage() {
+  getErrorPasswordMessage(): string {
     return this.userForm.controls['passwordUser'].hasError('required') ? 'You must enter a value' : '';
   }
 }

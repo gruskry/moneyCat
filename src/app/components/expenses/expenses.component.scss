@@ -38,7 +38,7 @@ body.expense-body {
     z-index: 1;
     width: 100%;
     height: 100%;
-    background: url('../../assets/image2vector.svg') 50% 50% / cover no-repeat;
+    background: url('../../../assets/image2vector.svg') 50% 50% / cover no-repeat;
     transition: all .5s ease;
   }
 
@@ -191,60 +191,66 @@ body.expense-body {
 
   .mat-form-field.mat-focused .mat-form-field-ripple {
     background-color: rgba(0, 128, 0, 0.589);
-}
+  }
 }
 
-.results {
-  display: flex;
+.reset {
   width: 95%;
-  justify-content: space-between;
+  margin: 0 auto;
+  text-align: end;
+  font-size: 12px;
+
+  .reset-icon{
+    color:rgba(31, 162, 48, 0.3);
+    cursor: pointer;
+  }
+  .reset-icon:hover {
+    color: rgba(0, 128, 0, 0.589) ;
+    transition: linear .3s
+  }
+}
+
+
+.results {
+  width: 95%;
   background: white;
-  border: 1px solid black;
-  border-radius: 5px;
   font-size: 1rem;
   box-sizing: border-box;
   margin: 5px auto;
 
-  p {
-    margin: auto 10px;
-    padding: 10px 0;
-    width: 33%;
-    text-align: center;
-  }
+  table {
+    width: 100%;
+    background-color: #fff;
+    border-radius: 5px;
 
-  p:first-child {
-    text-align: start;
-  }
 
-  p:last-child {
-    text-align: center;
-  }
-
-  input::placeholder {
-    color: black;
-    font-size: 1.2em;
-  }
-
-  form {
-    display: flex;
-    width: 33%;
-    justify-content: right;
-
-    p {
-      white-space: nowrap;
-      margin: auto 0;
-      padding-right: 20px;
-      text-align: right;
+    td, th {
+      vertical-align: middle;
+      text-align: center;
+      width: 33%;
+      color: #000;
     }
 
-    .results-currency {
-      font-size: 15px;
+    th.mat-header-cell, td.mat-cell, td.mat-footer-cell {
+      border-color: #000;
     }
-  }
 
-  ::ng-deep {
-    .mat-form-field {
-      margin-left: 5px;
+    tr:last-of-type {
+      border-bottom: none;
+    }
+
+    ::ng-deep {
+      .mat-sort-header-container {
+        justify-content: center;
+        border: none;
+      }
+
+      .mat-form-field-hide-placeholder .mat-select-placeholder {
+        color: transparent;
+        -webkit-text-fill-color: grey;
+        transition: none;
+        display: block;
+      }
     }
   }
 }
