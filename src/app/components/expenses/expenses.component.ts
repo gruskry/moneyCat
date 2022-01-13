@@ -21,7 +21,7 @@ import { TotalDialogComponent } from '../total-dialog/total-dialog.component';
 
 export class ExpensesComponent implements OnInit {
   dateNow = new Date();
-  currentDate: string = this.datePipe.transform(this.dateNow,"dd/MM/yyyy");
+  currentDate: string = this.datePipe.transform(this.dateNow,"MM/dd/yyyy");
   currentExchangeCurrency: string;
   currentExchangeAmount: number;
   selected: string = 'Home';
@@ -121,7 +121,7 @@ export class ExpensesComponent implements OnInit {
   changeDate(event: MatDatepickerInputEvent<Date>) {
     this.rows = [];
     this.isLoad = true;
-    let chosenDate = this.datePipe.transform(event.value,"dd/MM/yyyy");
+    let chosenDate = this.datePipe.transform(event.value,"MM/dd/yyyy");
     let dateReqFormat = this.datePipe.transform(event.value, 'MMddyyyy');
     this.expenseService.chosenDate.next(dateReqFormat)
     this.expenseService.getOptionsDate().then(user => {
