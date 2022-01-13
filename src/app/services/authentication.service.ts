@@ -15,13 +15,14 @@ export class AuthenticationService {
   isMainPage:  BehaviorSubject<boolean> = new BehaviorSubject(false);
   currencies: BehaviorSubject<CurrencyModel[]> = new BehaviorSubject([])
   constructor(
-    public auth: Auth,
+    private auth: Auth,
     private expenseSerice: ExpenseService,
     private _route: Router) { }
 
   logginState(): Observable<boolean> {
     this.auth.onAuthStateChanged((user) => {
       if(user) this.expenseSerice.currentUserSubj.next(user.uid);
+      user? this.isLoggedIn.next(true): this.isLoggedIn.next(false);
       if (user?.emailVerified) {
         this._route.navigateByUrl('/expenses')
         this.isLoggedIn.next(true)

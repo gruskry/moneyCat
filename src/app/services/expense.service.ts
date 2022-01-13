@@ -1,7 +1,6 @@
 import { CurrencyModel } from './../models/currency.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Auth } from '@angular/fire/auth';
 import { doc, setDoc, Firestore } from '@angular/fire/firestore';
 import { DatePipe } from '@angular/common';
 import { getDoc } from 'firebase/firestore';
@@ -17,7 +16,6 @@ export class ExpenseService {
   date: string;
   key: string = 'a6eb7b27036401f48cc7';
   constructor(
-    public auth: Auth,
     public db: Firestore,
     public datePipe: DatePipe,
     private http: HttpClient,
@@ -29,7 +27,11 @@ export class ExpenseService {
     setDoc(doc(this.db, `users/${this.currentUserSubj.value}/date/${this.date}`), {options})
   }
 
-  getOptions() {
+  getFullOptions() {
+    return getDoc(doc(this.db, `users/${this.currentUserSubj.value}/date/`))
+  }
+
+  getOptionsDate() {
     let currentDate = new Date();
     let newDateFormat = this.datePipe.transform(currentDate, 'MMddyyyy');
     (!this.chosenDate.value) ? this.chosenDate.next(newDateFormat) : '';
@@ -37,7 +39,7 @@ export class ExpenseService {
   }
 
   getCurrencies(): Observable<CurrencyModel[]> {
-    return this.http.get<CurrencyModel[]>('https://www.nbrb.by/api/exrates/currencies').pipe(map(options => options));
+    return this.http.get<CurrencyModel[]>('https://www.nbrb.by/api/exrates/rates?periodicity=0').pipe(map(options => options));
   }
 
   getExchangeRates(currentCurrency: string, selectedCurrency: string):Observable<object> {

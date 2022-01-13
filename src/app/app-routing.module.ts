@@ -1,7 +1,7 @@
-import { MainPageComponent } from './main-page/main-page.component';
+import { MainPageComponent } from './components/main-page/main-page.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ExpensesComponent } from './expenses/expenses.component';
+import { ExpensesComponent } from './components/expenses/expenses.component';
 import { ExpensesGuard } from './guards/expenses.guard';
 
 const routes: Routes = [
