@@ -110,11 +110,11 @@ export class ExpensesComponent implements OnInit {
     if(this.expenseForm.valid) {
       this.expenseForm.value.category = this.selected;
       this.expenseForm.value.date = this.datePipe.transform(this.expenseForm.value.date, 'MM/dd/yyyy')
+      this.rowsWithDefaultCur.push(this.expenseForm.value)
       this.rows.push(this.expenseForm.value);
-      this.dataSource = new MatTableDataSource(this.rows);
-
-      this.expenseService.setOptions(this.rows);
-      this.resetCurrencies()
+      this.dataSource = new MatTableDataSource(this.rowsWithDefaultCur);
+      this.resetCurrencies();
+      this.expenseService.setOptions(this.rowsWithDefaultCur);
     }
   }
 
@@ -156,7 +156,7 @@ export class ExpensesComponent implements OnInit {
   }
 
   checkSelectedCurrency(selectedCurrency) {
-    this.dataSource = new MatTableDataSource(this.rows)
+    this.dataSource = new MatTableDataSource(this.rows);
     this.rows.map((currency) => {
       this.currencies.forEach(typeCur => {
         let fullNameCurrency = `${typeCur.Cur_Name} (${typeCur.Cur_Abbreviation})`
@@ -172,15 +172,23 @@ export class ExpensesComponent implements OnInit {
   }
 
   resetCurrencies() {
-    this.rowsWithDefaultCur = []
     this.expenseService.getOptionsDate().then(user => {
+      this.rows = []
       this.isLoad = true
       if (user.exists()) {
-        this.rowsWithDefaultCur = user.data().options;
-        this.dataSource = new MatTableDataSource(this.rowsWithDefaultCur)
+        this.rowsWithDefaultCur = user.data().options
+        console.log(this.rowsWithDefaultCur)
+        user.data().options.forEach(el => {
+          if(el.date === this.currentDate) {
+            this.rows.push(el);
+            this.dataSource = new MatTableDataSource(this.rowsWithDefaultCur);
+          };
+        });
+      } else {
+         this.rows = [];
       }
       this.isLoad = false;
-    })
+    });
   }
 
   openDialog() {
