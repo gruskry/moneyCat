@@ -7,7 +7,6 @@ import { AuthenticationService } from '../../services/authentication.service';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
@@ -110,11 +109,12 @@ export class ExpensesComponent implements OnInit {
   submit() {
     if(this.expenseForm.valid) {
       this.expenseForm.value.category = this.selected;
-      this.expenseForm.value.date = this.datePipe.transform(this.expenseForm.value.date, 'dd/MM/yyyy')
+      this.expenseForm.value.date = this.datePipe.transform(this.expenseForm.value.date, 'MM/dd/yyyy')
       this.rows.push(this.expenseForm.value);
       this.dataSource = new MatTableDataSource(this.rows);
-      this.resetCurrencies()
+
       this.expenseService.setOptions(this.rows);
+      this.resetCurrencies()
     }
   }
 
@@ -156,7 +156,8 @@ export class ExpensesComponent implements OnInit {
   }
 
   checkSelectedCurrency(selectedCurrency) {
-    this.rows.map((currency: DbModel) => {
+    this.dataSource = new MatTableDataSource(this.rows)
+    this.rows.map((currency) => {
       this.currencies.forEach(typeCur => {
         let fullNameCurrency = `${typeCur.Cur_Name} (${typeCur.Cur_Abbreviation})`
         if(fullNameCurrency.includes(currency.currency)) {
@@ -171,18 +172,12 @@ export class ExpensesComponent implements OnInit {
   }
 
   resetCurrencies() {
-    this.rows = []
+    this.rowsWithDefaultCur = []
     this.expenseService.getOptionsDate().then(user => {
       this.isLoad = true
       if (user.exists()) {
-        user.data().options.forEach(el => {
-          if(el.date === this.currentDate) {
-            this.rows.push(el);
-            this.dataSource = new MatTableDataSource(this.rows);
-          };
-        });
-      } else {
-         this.rows = [];
+        this.rowsWithDefaultCur = user.data().options;
+        this.dataSource = new MatTableDataSource(this.rowsWithDefaultCur)
       }
       this.isLoad = false;
     })
