@@ -6,29 +6,25 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { MainPageComponent } from './main-page/main-page.component';
-
-import { MatFormFieldModule } from '@angular/material/form-field'
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatSelectModule } from '@angular/material/select';
+import { MainPageComponent } from './components/main-page/main-page.component';
 
 import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
-import { FirestoreModule, getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { FirestoreModule } from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
 import { provideAuth,getAuth } from '@angular/fire/auth';
 import { AuthenticationService } from './services/authentication.service';
-import { ExpensesComponent } from './expenses/expenses.component';
+import { ExpensesComponent } from './components/expenses/expenses.component';
 import { ExpenseService } from './services/expense.service';
+import { ExpensesGuard } from './guards/expenses.guard';
+import { HttpClientModule } from '@angular/common/http';
+import { MaterialModule } from './material/material.module';
+import { TotalDialogComponent } from './components/total-dialog/total-dialog.component';
 @NgModule({
   declarations: [
     AppComponent,
     MainPageComponent,
     ExpensesComponent,
+    TotalDialogComponent,
 
    ],
   imports: [
@@ -37,19 +33,14 @@ import { ExpenseService } from './services/expense.service';
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatButtonModule,
-    MatProgressSpinnerModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatSelectModule,
     FirestoreModule,
+    HttpClientModule,
+    MaterialModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
+    MaterialModule,
   ],
-  providers: [AuthenticationService, ExpenseService, DatePipe],
+  providers: [AuthenticationService, ExpenseService, DatePipe, ExpensesGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

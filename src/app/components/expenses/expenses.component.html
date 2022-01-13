@@ -1,0 +1,110 @@
+
+<body class="expense-body">
+  <div class="nav-bar">
+    <div class="logo-logout" (click)="logout()" routerLink="/home">
+      <p class="logout">Logout</p>
+    </div>
+  </div>
+
+  <div class="data-block">
+
+    <form class="expense-form" [formGroup]="expenseForm" >
+      <mat-form-field class="date-form-field" appearance="outline">
+        <input
+          matInput
+          [matDatepicker]="picker"
+          placeholder="Choose a date"
+          formControlName="date"
+          (dateInput)="changeDate($event)"
+          >
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker  #picker></mat-datepicker>
+        <mat-error *ngIf="expenseForm.controls['date'].invalid">{{getErrorMessage()}}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="expense title" formControlName="title">
+        <mat-error *ngIf="expenseForm.controls['title'].invalid">{{getErrorMessage()}}</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-select [(value)]="selected">
+          <mat-option value="Home">Home</mat-option>
+          <mat-option value="Travel">Travel</mat-option>
+          <mat-option value="Car">Car</mat-option>
+          <mat-option value="Food">Food</mat-option>
+        </mat-select>
+        <mat-error *ngIf="expenseForm.controls['category'].invalid">{{getErrorMessage()}}</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" >
+        <input matInput placeholder="amount" formControlName="amount" type="number" min="0">
+        <mat-error *ngIf="expenseForm.controls['amount'].invalid">{{getErrorMessage()}}</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <input
+          type="text"
+          matInput
+          formControlName="currency"
+          required
+          [matAutocomplete]="auto"
+          placeholder="currency"
+        >
+          <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let currency of filteredCurrencies | async" value="{{currency.Cur_Name}} ({{currency.Cur_Abbreviation}})">
+              {{currency.Cur_Name}} ({{currency.Cur_Abbreviation}})
+            </mat-option>
+          </mat-autocomplete>
+      </mat-form-field>
+      <button mat-button class="login_btn" type="submit" (click)="submit()"> Add expense</button>
+    </form>
+  </div>
+  <div class="reset" *ngIf="rows.length">
+    <span>Reset table to default currencies</span>
+    <mat-icon class="reset-icon" (click)="resetCurrencies()">update</mat-icon>
+  </div>
+  <div class="results" >
+    <mat-spinner *ngIf='isLoad'></mat-spinner>
+    <table mat-table [dataSource]="dataSource" matSort *ngIf="rows.length"
+      class="mat-elevation-z8">
+
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by name">
+          Expense title
+        </th>
+        <td mat-cell *matCellDef="let element"> {{element.title}} </td>
+        <td mat-footer-cell *matFooterCellDef> Total </td>
+      </ng-container>
+
+      <ng-container matColumnDef="category">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by weight">
+          Category
+        </th>
+        <td mat-cell *matCellDef="let element"> {{element.category}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="amount">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by symbol">
+          <mat-form-field [formGroup]="expenseForm" >
+            <mat-label></mat-label>
+            <mat-select placeholder="Choose currency" [value]="'Австралийский доллар (AUD)'">
+              <input
+                class="currency-changer"
+                placeholder="Search value"
+                formControlName="currencyChange"
+              >
+              <mat-option *ngFor="let currency of filteredCurrenciesChange | async " value="{{currency.Cur_Name}} ({{currency.Cur_Abbreviation}})" (click)='checkSelectedCurrency(currency)'>
+                {{currency.Cur_Name}} ({{currency.Cur_Abbreviation}})
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+        </th>
+        <td mat-cell *matCellDef="let element"> {{element.amount}} {{element.currency}} </td>
+        <td mat-footer-cell *matFooterCellDef>{{getTotal()}}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+</body>
+

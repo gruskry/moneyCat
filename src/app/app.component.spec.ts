@@ -1,16 +1,18 @@
+
+import { DatePipe } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
+import { ExpensesGuard } from './guards/expenses.guard';
+import { AuthenticationService } from './services/authentication.service';
+import { ExpenseService } from './services/expense.service';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule
-      ],
       declarations: [
-        AppComponent
+        AppComponent,
       ],
+      providers: [AuthenticationService, ExpenseService, DatePipe, ExpensesGuard],
     }).compileComponents();
   });
 
@@ -24,12 +26,5 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app.title).toEqual('moneyCat');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('moneyCat app is running!');
   });
 });
