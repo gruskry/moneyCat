@@ -18,14 +18,12 @@ import { ExpenseService } from './services/expense.service';
 import { ExpensesGuard } from './guards/expenses.guard';
 import { HttpClientModule } from '@angular/common/http';
 import { MaterialModule } from './material/material.module';
-import { TotalDialogComponent } from './components/total-dialog/total-dialog.component';
+
 @NgModule({
   declarations: [
     AppComponent,
     MainPageComponent,
     ExpensesComponent,
-    TotalDialogComponent,
-
    ],
   imports: [
     BrowserModule,

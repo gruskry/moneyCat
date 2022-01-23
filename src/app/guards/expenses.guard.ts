@@ -1,23 +1,25 @@
-import { AuthenticationService } from './../services/authentication.service';
-import {CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot} from "@angular/router";
-import {Observable, of, Subject} from "rxjs";
+import {CanActivate} from "@angular/router";
+import {Observable} from "rxjs";
 import { Injectable } from '@angular/core';
-import { Auth, user } from '@angular/fire/auth';
-import { first, shareReplay } from 'rxjs/operators';
+import { Auth } from '@angular/fire/auth';
+import { getAuth } from "firebase/auth";
+
 @Injectable({
   providedIn: 'root'
 })
 export class ExpensesGuard implements CanActivate{
   constructor(
-    private authService: AuthenticationService,
     public auth: Auth,
     ){}
 
-    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) : Observable<boolean> | boolean{
-      let userState = new Subject<boolean>();
-      this.authService.logginState().subscribe(currentState => {
-        userState.next(currentState)
-      })
-      return userState.asObservable();
+    canActivate() : Observable<boolean> | boolean{
+      const auth: Auth = getAuth();
+      const user = auth.currentUser;
+      if(user || localStorage.getItem('access_token')){
+        return true
+      }
+      else{
+        return false
+      }
     }
 }
