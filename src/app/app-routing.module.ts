@@ -7,8 +7,7 @@ import { ExpensesGuard } from './guards/expenses.guard';
 const routes: Routes = [
   { path: 'home', component: MainPageComponent, },
   { path: 'expenses', component: ExpensesComponent, canActivate: [ExpensesGuard], pathMatch: 'full' },
-  { path: '**', redirectTo:'/home',},
-
+  { path: '**', redirectTo:'home',},
 ];
 
 @NgModule({
