@@ -1,26 +1,45 @@
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Observable, of } from 'rxjs';
 import { MaterialModule } from './../../material/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ComponentFixture, fakeAsync, flush, TestBed } from "@angular/core/testing";
+import { ComponentFixture, fakeAsync, flush, inject, TestBed } from "@angular/core/testing";
 import { MainPageComponent } from "./main-page.component";
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ExpensesComponent } from '../expenses/expenses.component';
+import { Router, Routes } from '@angular/router';
+import { ExpensesGuard } from 'src/app/guards/expenses.guard';
 
 describe('MainPageComponent', () => {
   let component: MainPageComponent;
   let fixture: ComponentFixture<MainPageComponent>;
   let authService: AuthenticationService;
-  let _snackBar: MatSnackBar;
-
+  let router = {
+    navigate: jasmine.createSpy('navigate'),
+  };
+  const routes: Routes = [
+    { path: 'home', component: MainPageComponent, },
+    { path: 'expenses', component: ExpensesComponent, canActivate: [ExpensesGuard], pathMatch: 'full' },
+    { path: '**', redirectTo:'home',},
+  ];
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [FormsModule, ReactiveFormsModule, MaterialModule, RouterTestingModule, BrowserAnimationsModule],
-      providers: [{provide: AuthenticationService, useValue: {
-        singIn(): Promise<any> {return Promise.resolve('user')},
-        singUp(): Promise<any> {return Promise.resolve('user')}
-      }}],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        MaterialModule,
+        RouterTestingModule.withRoutes(routes),
+        BrowserAnimationsModule
+      ],
+      providers: [
+        { provide: AuthenticationService, useValue: {
+          singIn(): Promise<any> {return Promise.resolve('user')},
+          singUp(): Promise<any> {return Promise.resolve('user')},
+          setTokens(cred): Object {return cred}
+        }},
+
+
+     ],
       declarations: [MainPageComponent]
     }).compileComponents();
 
@@ -39,6 +58,12 @@ describe('MainPageComponent', () => {
       component.ngOnInit()
       expect(onInit).toHaveBeenCalled()
     })
+    it('localStorage should contain access_token', inject([Router], (router: Router) => {
+      spyOn(localStorage, 'getItem').and.returnValue('test');
+      const routerSpy = spyOn(router, 'navigate')
+      component.ngOnInit()
+      expect(routerSpy).toHaveBeenCalledWith(['/expenses']);
+    }))
 
   })
   describe('#auth', () => {
@@ -70,10 +95,12 @@ describe('MainPageComponent', () => {
         passwordUser: '123456'
       });
       spyOn(authService, 'singIn').and.returnValue(Promise.resolve({user: {emailVerified: false}}));
+      const setTokensSpy = spyOn(authService, 'setTokens')
       const formSpy = spyOn(component.userForm, 'reset').and.callThrough()
       component.singIn();
       expect(component.userForm.valid).toBeTrue()
       authService.singIn('test', 'test').then((cred) => {
+        expect(setTokensSpy).toHaveBeenCalledWith(cred);
         expect(cred).not.toBeFalsy()
         expect(cred.user.emailVerified).toBeFalse();
         expect(formSpy).toHaveBeenCalled()

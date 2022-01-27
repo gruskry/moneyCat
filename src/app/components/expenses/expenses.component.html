@@ -91,7 +91,7 @@
                 placeholder="Search value"
                 formControlName="currencyChange"
               >
-              <mat-option *ngFor="let currency of filteredCurrencies | async " [value]="currency" (click)='checkSelectedCurrency(currency)'>
+              <mat-option *ngFor="let currency of filteredCurrenciesChange | async " [value]="currency" (click)='checkSelectedCurrency(currency)'>
                 {{currency.Cur_Name}} ({{currency.Cur_Abbreviation}})
               </mat-option>
             </mat-select>

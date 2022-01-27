@@ -1,10 +1,10 @@
-import { CurrencyModel } from '../../models/currency.model';
+import { CurrencyModel } from './../../models/currency.model';
 import { map} from 'rxjs/operators';
 import { ExpenseService } from '../../services/expense.service';
 import { Observable } from 'rxjs';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthenticationService } from '../../services/authentication.service';
-import { FormBuilder, FormControl, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroupDirective, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { MatSort } from '@angular/material/sort';
@@ -55,12 +55,13 @@ export class ExpensesComponent implements OnInit {
     this.rows = [];
     this.currencies = this.expenseService.getCurrencies();
     this.filteredCurrencies = this.currencies;
-
+    this.filteredCurrenciesChange = this.currencies;
     this.expenseService.getOptionsDate().then(user => {
       this.isLoad = true
       if (user.exists()) {
         this.rowsWithDefaultCur = user.data().options;
         user.data().options.forEach(el => {
+          /* istanbul ignore else */
           if(el.date === this.currentDate) {
             this.rows.push(el);
             this.dataSource = new MatTableDataSource(this.rows);
@@ -77,19 +78,19 @@ export class ExpensesComponent implements OnInit {
       this.isLoad = false;
     })
 
-    this.expenseForm.get('currency')!.valueChanges.subscribe((value: string) => {
-      this.updateCurrentCurrencies(value);
+    this.expenseForm.get('currency')!.valueChanges.subscribe(value => {
+      this.filteredCurrencies = this.updateCurrentCurrencies(value)
     })
 
-    this.expenseForm.get('currencyChange').valueChanges.subscribe((value: string) => {
-      this.updateCurrentCurrencies(value);
+    this.expenseForm.get('currencyChange').valueChanges.subscribe(value => {
+      this.filteredCurrenciesChange = this.updateCurrentCurrencies(value);
     })
 
     this.isLoad = false;
   }
 
-  updateCurrentCurrencies(value: string) {
-    this.filteredCurrencies = this.currencies.pipe(
+  updateCurrentCurrencies(value): Observable<CurrencyModel[]> {
+    return this.currencies.pipe(
       map((currency: CurrencyModel[]) => {
         currency.push({
           Cur_Name: 'Белорусский рубль',
@@ -99,7 +100,8 @@ export class ExpensesComponent implements OnInit {
         })
         return currency.filter((currencyItem: CurrencyModel)=> {
           const filterValue = this._normalizeValue(value)
-          return this._normalizeValue(currencyItem.Cur_Name + currencyItem.Cur_Abbreviation).includes(filterValue)
+          console.log(this._normalizeValue(`${currencyItem.Cur_Name} (${currencyItem.Cur_Abbreviation})`).includes(filterValue))
+          return this._normalizeValue(`${currencyItem.Cur_Name} (${currencyItem.Cur_Abbreviation})`).includes(filterValue)
         })
       })
     )
@@ -118,6 +120,7 @@ export class ExpensesComponent implements OnInit {
   }
 
   submit() {
+    /* istanbul ignore else */
     if(this.expenseForm.valid) {
       this.expenseForm.value.category = this.selected;
       this.expenseForm.value.date = this.datePipe.transform(this.expenseForm.value.date, 'MM/dd/yyyy')
@@ -134,21 +137,21 @@ export class ExpensesComponent implements OnInit {
     this.isLoad = true;
     let chosenDate = this.datePipe.transform(event.value,"MM/dd/yyyy");
     let dateReqFormat = this.datePipe.transform(event.value, 'MMddyyyy');
+    this.currentDate = chosenDate;
     this.expenseService.chosenDate.next(dateReqFormat)
     this.expenseService.getOptionsDate().then(user => {
       if (user.exists()) {
-        if (user.data().options) {
-          this.rowsWithDefaultCur = user.data().options;
-          user.data().options.forEach(el => {
-            if(el.date === chosenDate)  {
-              this.rows.push(el);
-              this.dataSource = new MatTableDataSource(this.rows);
-              setTimeout(() => {
-                this.dataSource.sort = this.sort;
-              });
-            }
-          });
-        }
+        this.rowsWithDefaultCur = user.data().options;
+        user.data().options.forEach(el => {
+          /* istanbul ignore else */
+          if(el.date === chosenDate)  {
+            this.rows.push(el);
+            this.dataSource = new MatTableDataSource(this.rows);
+            setTimeout(() => {
+              this.dataSource.sort = this.sort;
+            });
+          }
+        });
       } else {
          this.rows = [];
          this.dataSource = new MatTableDataSource(this.rows)
@@ -167,14 +170,13 @@ export class ExpensesComponent implements OnInit {
   }
 
   checkSelectedCurrency(selectedCurrency) {
-    this.currencies.subscribe(data => console.log(data))
-    this.filteredCurrencies = this.currencies
+    this.filteredCurrenciesChange = this.currencies
     this.dataSource = new MatTableDataSource(this.rows);
-    this.rows = this.rows.map((currency) => {
-      currency.amount = ((currency.amount * currency.currency.Cur_OfficialRate) / selectedCurrency.Cur_OfficialRate).toFixed(2)
-      currency.currency.Cur_Name = selectedCurrency.Cur_Name;
-      currency.currency.Cur_Abbreviation = selectedCurrency.Cur_Abbreviation
-      return currency;
+    this.rows = this.rows.map((item) => {
+      item.amount = ((item.amount * item.currency.Cur_OfficialRate) / selectedCurrency.Cur_OfficialRate).toFixed(2)
+      item.currency.Cur_Name = selectedCurrency.Cur_Name;
+      item.currency.Cur_Abbreviation = selectedCurrency.Cur_Abbreviation
+      return item;
     })
   }
 
@@ -185,6 +187,7 @@ export class ExpensesComponent implements OnInit {
       if (user.exists()) {
         this.rowsWithDefaultCur = user.data().options
         user.data().options.forEach(el => {
+          /* istanbul ignore else */
           if(el.date === this.currentDate) {
             this.rows.push(el);
             this.dataSource = new MatTableDataSource(this.rowsWithDefaultCur);
