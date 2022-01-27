@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { sendEmailVerification } from '@angular/fire/auth';
 
@@ -26,26 +27,21 @@ export class MainPageComponent implements OnInit{
     private formBuilder: FormBuilder,
     private authService: AuthenticationService,
     private _snackBar: MatSnackBar,
+    private router: Router,
     ) { }
   ngOnInit(): void {
-    this.authService.logginState()
+    if(localStorage.getItem('access_token')) this.router.navigate(['/expenses']);
   }
-
-  formIsValid(): boolean {
-    return (this.userForm.get('emailUser').valid && this.userForm.get('passwordUser').valid)
-  }
-
 
   singIn() {
     if(this.userForm.valid) {
       this.isLoad = true;
       this.authService.singIn(this.userForm.value.emailUser,this.userForm.value.passwordUser)
         .then(cred =>  {
-          if(cred) {
-            if (!cred.user.emailVerified) {
-              this._snackBar.open('Please verify your email address', 'OK', {duration: 5000})
-              this.userForm.reset();
-            }
+          this.authService.setTokens(cred);
+          if (!cred.user.emailVerified) {
+            this._snackBar.open('Please verify your email address', 'OK', {duration: 5000})
+            this.userForm.reset();
           }
         })
         .catch(err => {
@@ -69,10 +65,10 @@ export class MainPageComponent implements OnInit{
       this.isLoad = true;
       this.authService.singUp(this.userForm.value.emailUser,this.userForm.value.passwordUser)
       .then(userCred => {
-        sendEmailVerification(userCred.user);
         if (!userCred.user.emailVerified) {
           this._snackBar.open('Please verify your email and sing In', 'OK', {duration: 5000})
-          this.userForm.reset()
+          this.userForm.reset();
+          sendEmailVerification(userCred.user);
         }
       })
       .catch(errMsg => {

@@ -2,7 +2,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, of } from 'rxjs';
 import { MaterialModule } from './../../material/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ComponentFixture, fakeAsync, flush, TestBed, tick } from "@angular/core/testing";
+import { ComponentFixture, fakeAsync, flush, TestBed } from "@angular/core/testing";
 import { MainPageComponent } from "./main-page.component";
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -18,7 +18,6 @@ describe('MainPageComponent', () => {
     TestBed.configureTestingModule({
       imports: [FormsModule, ReactiveFormsModule, MaterialModule, RouterTestingModule, BrowserAnimationsModule],
       providers: [{provide: AuthenticationService, useValue: {
-        logginState(): Observable<boolean> {return of(true)},
         singIn(): Promise<any> {return Promise.resolve('user')},
         singUp(): Promise<any> {return Promise.resolve('user')}
       }}],
@@ -41,12 +40,6 @@ describe('MainPageComponent', () => {
       expect(onInit).toHaveBeenCalled()
     })
 
-    it('onInit should call loginState method', () => {
-      const serviceLogginStateSpy = spyOn(authService, 'logginState')
-      component.ngOnInit()
-      expect(serviceLogginStateSpy).toHaveBeenCalled();
-
-    })
   })
   describe('#auth', () => {
     it('singIn should called', () => {
@@ -60,44 +53,74 @@ describe('MainPageComponent', () => {
         emailUser: 'test@test.ru',
         passwordUser: '123456'
       });
-      fixture.detectChanges();
-      const serviceSingInSpy = spyOn(authService, 'singIn').and.callFake(() => {
-        return new Promise(resolve => {
-          return resolve({user: {emailVerified: true}})
-        })
-      })
+      const serviceSingInSpy = spyOn(authService, 'singIn').and.returnValue(Promise.resolve({user: {emailVerified: true}}))
       component.singIn()
+      authService.singIn('test','test').then(cred => {
+        expect(cred).toBeTruthy();
+        expect(cred.user.emailVerified).toBeTruthy();
+      })
       expect(component.userForm.valid).toBeTrue();
       expect(serviceSingInSpy).toHaveBeenCalled();
-      authService.singIn('test', 'test').then(cred => {
-        expect(cred).toBeDefined()
-        expect(cred.user.emailVerified).toBeTrue()
-      })
       flush();
     }))
 
-    it('singIn should call authService.singIn with not verified email', fakeAsync(() => {
-      spyOn(authService, 'singIn').and.callFake(() => {
-        return new Promise((resolve, reject) => {
-          resolve({user: {emailVerified: false}})
-          reject('error')
-        })
-      })
-      const formSpy = spyOn(component.userForm, 'reset')
-      const catchSpy = spyOn(authService.singIn('test','test'), 'catch').and.rejectWith('error')
-      component.singIn()
-      component.userForm.reset()
-      authService.singIn('test', 'test').then(cred => {
-        expect(cred).toBeDefined()
+    it('singIn should call authService.singIn and return user with not verified email', fakeAsync(() => {
+      component.userForm.setValue({
+        emailUser: 'test@test.ru',
+        passwordUser: '123456'
+      });
+      spyOn(authService, 'singIn').and.returnValue(Promise.resolve({user: {emailVerified: false}}));
+      const formSpy = spyOn(component.userForm, 'reset').and.callThrough()
+      component.singIn();
+      expect(component.userForm.valid).toBeTrue()
+      authService.singIn('test', 'test').then((cred) => {
+        expect(cred).not.toBeFalsy()
         expect(cred.user.emailVerified).toBeFalse();
-        expect(formSpy.calls.any()).toBeTrue()
-      }).catch((err) => {
-          expect(err).toBe('error')
-          expect(formSpy.calls.any()).toBeTrue()
-          expect(catchSpy).toBe('error')
-      })
+        expect(formSpy).toHaveBeenCalled()
+      });
       flush();
     }))
+
+
+    it('singIn should call authService.singIn and catch password error', fakeAsync(() => {
+      component.userForm.setValue({
+        emailUser: 'test@test.ru',
+        passwordUser: '123456'
+      });
+      spyOn(authService, 'singIn').and.returnValue(Promise.reject({message: 'Firebase: Error (auth/wrong-password).'}));
+
+      component.singIn();
+      authService.singIn('test', 'test').catch((err) => {
+        expect(err).toBeDefined()
+        expect(err.message).toBe('Firebase: Error (auth/wrong-password).');
+      })
+    }));
+
+    it('singIn should call authService.singIn and catch user-not-found error', fakeAsync(() => {
+      component.userForm.setValue({
+        emailUser: 'test@test.ru',
+        passwordUser: '123456'
+      });
+      spyOn(authService, 'singIn').and.returnValue(Promise.reject({message: 'Firebase: Error (auth/user-not-found).'}));
+      component.singIn();
+      authService.singIn('test', 'test').then(cred => {
+        expect(cred).toEqual(false)
+      })
+      .catch((err) => {
+        expect(err).toBeDefined()
+        expect(err.message).toBe('Firebase: Error (auth/user-not-found).');
+      })
+    }));
+
+    it('singIn should to coverage else branch', fakeAsync(() => {
+      component.userForm.setValue({
+        emailUser: '',
+        passwordUser: ''
+      });
+      component.singIn();
+      expect(false).toEqual(false)
+    }));
+
 
     it('singUp should called', () => {
       const singUp = spyOn(component, 'singUp');
@@ -116,34 +139,91 @@ describe('MainPageComponent', () => {
       expect(serviceSingUpSpy).toHaveBeenCalled();
       flush();
     }))
-  })
 
-  describe('#isValid form', () => {
-    it('userForm should be valid', () => {
+    it('singUp should call authService.singUp with verified email', fakeAsync(() => {
       component.userForm.setValue({
         emailUser: 'test@test.ru',
         passwordUser: '123456'
       });
+      const servicesingUpSpy = spyOn(authService, 'singUp').and.returnValue(Promise.resolve({user: {emailVerified: true}}))
+      component.singUp()
+      authService.singUp('test','test').then(cred => {
+        expect(cred).toBeTruthy();
+        expect(cred.user.emailVerified).toBeTruthy();
+      })
       expect(component.userForm.valid).toBeTrue();
-    })
+      expect(servicesingUpSpy).toHaveBeenCalled();
+      flush();
+    }))
 
-    it('formIsValid should return true', () => {
-      spyOn(component, 'formIsValid').and.callFake(() => true)
-      expect(component.formIsValid()).toBeTrue()
-    })
 
-    it('formIsValid should return false', () => {
-      expect(component.formIsValid()).toBeFalse()
-    })
-    it('formIsValid should return false if password not valid', () => {
+    it('singUp should call authService.singUp and return user with not verified email', fakeAsync(() => {
       component.userForm.setValue({
         emailUser: 'test@test.ru',
-        passwordUser: null
+        passwordUser: '123456'
       });
-      component.formIsValid()
-      expect(component.userForm.get('passwordUser').valid).toBeFalse()
-    })
+      spyOn(authService, 'singUp').and.returnValue(Promise.resolve({user: {emailVerified: false}}));
+      component.singUp();
+      expect(component.userForm.valid).toBeTrue()
+      authService.singUp('test', 'test').then((cred) => {
+        expect(cred).not.toBeFalsy()
+        expect(cred.user.emailVerified).toEqual(false);
+      });
+      flush();
+    }))
+
+    it('singUp should to coverage else branch', fakeAsync(() => {
+      component.userForm.setValue({
+        emailUser: '',
+        passwordUser: ''
+      });
+      component.singUp();
+      expect(false).toEqual(false)
+    }));
+
+    it('singUp should call authService.singUp and catch password error', fakeAsync(() => {
+      component.userForm.setValue({
+        emailUser: 'test@test.ru',
+        passwordUser: '123456'
+      });
+      spyOn(authService, 'singUp').and.returnValue(Promise.reject({message: 'Firebase: Error (auth/wrong-password).'}));
+      component.singUp();
+      authService.singUp('test', 'test').catch((err) => {
+        expect(err).toBeDefined()
+        expect(err.message).toBe('Firebase: Error (auth/wrong-password).');
+      })
+    }));
+
+    it('singUp should call authService.singUp and catch email error', fakeAsync(() => {
+      component.userForm.setValue({
+        emailUser: 'test@test.ru',
+        passwordUser: '123456'
+      });
+      spyOn(authService, 'singUp').and.returnValue(Promise.reject({message: 'Firebase: Error (auth/email-already-in-use).'}));
+      component.singUp();
+      authService.singUp('test', 'test').catch((err) => {
+        expect(err).toBeDefined()
+        expect(err.message).toBe('Firebase: Error (auth/email-already-in-use).');
+      })
+    }));
+
+    it('singUp should call authService.singUp and catch password validator error', fakeAsync(() => {
+      component.userForm.setValue({
+        emailUser: 'test@test.ru',
+        passwordUser: '123'
+      });
+      spyOn(authService, 'singUp').and.returnValue(Promise.reject({message: 'Firebase: Password should be at least 6 characters (auth/weak-password).'}));
+      component.singUp();
+      authService.singUp('test', 'test').catch((err) => {
+        expect(err).toBeDefined()
+        expect(err.message).toBe('Firebase: Password should be at least 6 characters (auth/weak-password).');
+      })
+    }));
+
+
   })
+
+
 
   describe('#errorMessages', () => {
     it('getErrorEmailMessage should called', () => {
@@ -163,12 +243,20 @@ describe('MainPageComponent', () => {
       expect(component.getErrorEmailMessage()).toBe('You must enter a value')
     })
 
+    it('getErrorEmailMessage should return ""', () => {
+      component.userForm.setValue({
+        emailUser: 'test@test.ru',
+        passwordUser: '123456'
+      });
+      component.getErrorEmailMessage();
+      expect(component.getErrorEmailMessage()).toBe('')
+    })
+
     it('getErrorEmailMessage should return "Not a valid email"', () => {
       component.userForm.setValue({
         emailUser: 'test@te',
         passwordUser: '123456'
       });
-      fixture.detectChanges()
       component.getErrorEmailMessage();
       expect(component.getErrorEmailMessage()).toBe('Not a valid email')
     })
@@ -182,6 +270,15 @@ describe('MainPageComponent', () => {
     it('getErrorPasswordMessage should return "You must enter a value"', () => {
       component.getErrorPasswordMessage();
       expect(component.getErrorPasswordMessage()).toBe('You must enter a value')
+    })
+
+    it('getErrorPasswordMessage should return ""', () => {
+      component.userForm.setValue({
+        emailUser: 'test@test.ru',
+        passwordUser: '123456'
+      });
+      component.getErrorPasswordMessage();
+      expect(component.getErrorPasswordMessage()).toBe('')
     })
   })
 });

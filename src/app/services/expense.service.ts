@@ -11,7 +11,6 @@ import { map } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class ExpenseService {
-  currentUserSubj: BehaviorSubject<string> = new BehaviorSubject('');
   chosenDate: BehaviorSubject<string> = new BehaviorSubject('');
   date: string;
   key: string = 'a6eb7b27036401f48cc7';
@@ -24,11 +23,11 @@ export class ExpenseService {
   setOptions(options) {
     options.forEach(el => this.date = el.date);
     this.date = this.datePipe.transform(this.date, 'MMddyyyy');
-    setDoc(doc(this.db, `users/${this.currentUserSubj.value}/date/${this.date}`), {options})
+    setDoc(doc(this.db, `users/${localStorage.getItem('user_uid')}/date/${this.date}`), {options})
   }
 
   getFullOptions() {
-    return getDoc(doc(this.db, `users/${this.currentUserSubj.value}/date/`))
+    return getDoc(doc(this.db, `users/${localStorage.getItem('user_uid')}/date/`))
   }
 
   getOptionsDate() {
@@ -36,7 +35,7 @@ export class ExpenseService {
     let newDateFormat = this.datePipe.transform(currentDate, 'MMddyyyy');
 
     (!this.chosenDate.value) ? this.chosenDate.next(newDateFormat) : '';
-    return getDoc(doc(this.db, `users/${this.currentUserSubj.value}/date/${this.chosenDate.value}`))
+    return getDoc(doc(this.db, `users/${localStorage.getItem('user_uid')}/date/${this.chosenDate.value}`))
   }
 
   getCurrencies(): Observable<CurrencyModel[]> {

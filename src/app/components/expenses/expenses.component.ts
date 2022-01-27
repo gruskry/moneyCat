@@ -1,5 +1,5 @@
-import { CurrencyModel, DbModel } from '../../models/currency.model';
-import { map, startWith } from 'rxjs/operators';
+import { CurrencyModel } from '../../models/currency.model';
+import { map} from 'rxjs/operators';
 import { ExpenseService } from '../../services/expense.service';
 import { Observable } from 'rxjs';
 import { Component, OnInit, ViewChild } from '@angular/core';
@@ -9,8 +9,6 @@ import { DatePipe } from '@angular/common';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatDialog } from '@angular/material/dialog';
-import { TotalDialogComponent } from '../total-dialog/total-dialog.component';
 
 @Component({
   selector: 'app-expenses',
@@ -29,7 +27,7 @@ export class ExpensesComponent implements OnInit {
   rows = [];
   rowsWithDefaultCur = []
   isLoad: boolean = false;
-  currencies: CurrencyModel[] = this.authService.currencies.value;
+  currencies: Observable<CurrencyModel[]>;
   filteredCurrencies: Observable<CurrencyModel[]>;
   filteredCurrenciesChange: Observable<CurrencyModel[]>;
   displayedColumns: string[] = ['title', 'category', 'amount'];
@@ -39,8 +37,9 @@ export class ExpensesComponent implements OnInit {
     "title": new FormControl('', [Validators.required]),
     "category": new FormControl('Home', [Validators.required]),
     "amount": new FormControl('', [Validators.required]),
-    'currency': new FormControl('', [Validators.required]),
+    'currency': new FormControl(null, [Validators.required]),
     'currencyChange': new FormControl(''),
+    'rateToByn': new FormControl(null),
   })
 
   constructor(
@@ -48,20 +47,15 @@ export class ExpensesComponent implements OnInit {
     private formBuilder: FormBuilder,
     private datePipe: DatePipe,
     private expenseService: ExpenseService,
-    private dialog: MatDialog
     ) {}
 
   @ViewChild(MatSort) sort: MatSort;
 
   ngOnInit(): void {
     this.rows = [];
-    this.currencies.push({
-      Cur_Name: 'Белорусский рубль',
-      Cur_Abbreviation: 'BYN',
-      Cur_OfficialRate: 1,
-      Cur_Scale: 1,
-    });
-    this.currencies = this.currencies.filter((v,i,a)=>a.findIndex(t=>(t.Cur_Name === v.Cur_Name))===i).sort((a,b) => a.Cur_Name > b.Cur_Name ? 1 : -1);
+    this.currencies = this.expenseService.getCurrencies();
+    this.filteredCurrencies = this.currencies;
+
     this.expenseService.getOptionsDate().then(user => {
       this.isLoad = true
       if (user.exists()) {
@@ -82,26 +76,43 @@ export class ExpensesComponent implements OnInit {
       }
       this.isLoad = false;
     })
-    this.filteredCurrencies = this.expenseForm.get('currency')!.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(value)),
-    )
-    this.filteredCurrenciesChange = this.expenseForm.get('currencyChange').valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(value))
-    )
+
+    this.expenseForm.get('currency')!.valueChanges.subscribe((value: string) => {
+      this.updateCurrentCurrencies(value);
+    })
+
+    this.expenseForm.get('currencyChange').valueChanges.subscribe((value: string) => {
+      this.updateCurrentCurrencies(value);
+    })
+
     this.isLoad = false;
   }
 
-  private _filter(value: string): CurrencyModel[] {
+  updateCurrentCurrencies(value: string) {
+    this.filteredCurrencies = this.currencies.pipe(
+      map((currency: CurrencyModel[]) => {
+        currency.push({
+          Cur_Name: 'Белорусский рубль',
+          Cur_Abbreviation: 'BYN',
+          Cur_OfficialRate: 1,
+          Cur_Scale: 1,
+        })
+        return currency.filter((currencyItem: CurrencyModel)=> {
+          const filterValue = this._normalizeValue(value)
+          return this._normalizeValue(currencyItem.Cur_Name + currencyItem.Cur_Abbreviation).includes(filterValue)
+        })
+      })
+    )
+  }
 
-    const filterValue = this._normalizeValue(value);
-    return this.currencies.filter(currency => this._normalizeValue(currency.Cur_Name + currency.Cur_Abbreviation).includes(filterValue));
+  displayCurrencyName(currency?: CurrencyModel) {
+    return currency ? `${currency.Cur_Name} (${currency.Cur_Abbreviation})`: null;
   }
 
   private _normalizeValue(value: string): string {
     return value.toLowerCase().replace(/\s/g, '');
   }
+
   logout() {
     this.authService.logout()
   }
@@ -156,18 +167,14 @@ export class ExpensesComponent implements OnInit {
   }
 
   checkSelectedCurrency(selectedCurrency) {
+    this.currencies.subscribe(data => console.log(data))
+    this.filteredCurrencies = this.currencies
     this.dataSource = new MatTableDataSource(this.rows);
-    this.rows.map((currency) => {
-      this.currencies.forEach(typeCur => {
-        let fullNameCurrency = `${typeCur.Cur_Name} (${typeCur.Cur_Abbreviation})`
-        if(fullNameCurrency.includes(currency.currency)) {
-          let changeToByn: number;
-          changeToByn = ((currency.amount * typeCur.Cur_OfficialRate) / typeCur.Cur_Scale);
-          currency.amount = Math.round(((changeToByn / selectedCurrency.Cur_OfficialRate) * selectedCurrency.Cur_Scale));
-          currency.currency = `${selectedCurrency.Cur_Name} (${selectedCurrency.Cur_Abbreviation})`;
-        }
-      })
-
+    this.rows = this.rows.map((currency) => {
+      currency.amount = ((currency.amount * currency.currency.Cur_OfficialRate) / selectedCurrency.Cur_OfficialRate).toFixed(2)
+      currency.currency.Cur_Name = selectedCurrency.Cur_Name;
+      currency.currency.Cur_Abbreviation = selectedCurrency.Cur_Abbreviation
+      return currency;
     })
   }
 
@@ -177,7 +184,6 @@ export class ExpensesComponent implements OnInit {
       this.isLoad = true
       if (user.exists()) {
         this.rowsWithDefaultCur = user.data().options
-        console.log(this.rowsWithDefaultCur)
         user.data().options.forEach(el => {
           if(el.date === this.currentDate) {
             this.rows.push(el);
@@ -189,10 +195,6 @@ export class ExpensesComponent implements OnInit {
       }
       this.isLoad = false;
     });
-  }
-
-  openDialog() {
-    this.dialog.open(TotalDialogComponent);
   }
 }
 
