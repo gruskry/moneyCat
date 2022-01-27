@@ -1,10 +1,14 @@
+import { environment } from './../environments/environment.prod';
 
 import { DatePipe } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
+
+
 import { AppComponent } from './app.component';
 import { ExpensesGuard } from './guards/expenses.guard';
 import { AuthenticationService } from './services/authentication.service';
 import { ExpenseService } from './services/expense.service';
+import { FirestoreModule } from '@angular/fire/firestore';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
@@ -12,7 +16,7 @@ describe('AppComponent', () => {
       declarations: [
         AppComponent,
       ],
-      providers: [AuthenticationService, ExpenseService, DatePipe, ExpensesGuard],
+      providers: [AuthenticationService, ExpenseService, DatePipe],
     }).compileComponents();
   });
 
